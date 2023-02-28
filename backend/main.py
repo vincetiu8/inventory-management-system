@@ -1,9 +1,11 @@
 from flask import Blueprint
 from werkzeug.security import generate_password_hash
 
+from controllers.item import items_bp
 from extensions import app, db
-from controllers.employee import employee_bp
+from controllers.employee import employees_bp
 from models.employee import Employee
+from models.item import Item
 
 if __name__ == "__main__":
     # reset database tables
@@ -27,11 +29,22 @@ if __name__ == "__main__":
         is_admin=False
     )
     db.session.add(employee)
+    item = Item(
+        name="Item 1",
+        description="Item 1 description",
+    )
+    db.session.add(item)
+    item = Item(
+        name="Item 2",
+        description="Item 2 description",
+    )
+    db.session.add(item)
     db.session.commit()
 
     # register controller routes
     bp = Blueprint("main", __name__)
-    bp.register_blueprint(employee_bp, url_prefix="/employees")
+    bp.register_blueprint(employees_bp, url_prefix="/employees")
+    bp.register_blueprint(items_bp, url_prefix="/items")
     app.register_blueprint(bp, url_prefix="/api")
 
     # run the app
