@@ -9,22 +9,10 @@ from controllers.utils import jsonify_message, token_required, generate_token
 from extensions import db
 from models.employee import Employee
 
-employee_bp = Blueprint("users", __name__)
+employees_bp = Blueprint("employees", __name__)
 
 
-@employee_bp.route("/all", methods=["GET"])
-@token_required
-def get_all_employees(_):
-    """
-    Gets all employees.
-    :return: all employees in the system
-    """
-    employees = db.session.execute(db.select(Employee)).scalars()
-    serialized_employees = [user.serialize() for user in employees]
-    return jsonify(serialized_employees), HTTPStatus.OK
-
-
-@employee_bp.route("/create", methods=["POST"])
+@employees_bp.route("/create", methods=["POST"])
 @token_required
 def create_employee(origin_employee):
     """
@@ -48,7 +36,19 @@ def create_employee(origin_employee):
     return jsonify(employee.serialize()), HTTPStatus.CREATED
 
 
-@employee_bp.route("/<email>", methods=["GET", "PUT", "DELETE"])
+@employees_bp.route("/all", methods=["GET"])
+@token_required
+def get_all_employees(_):
+    """
+    Gets all employees.
+    :return: all employees in the system
+    """
+    employees = db.session.execute(db.select(Employee)).scalars()
+    serialized_employees = [employee.serialize() for employee in employees]
+    return jsonify(serialized_employees), HTTPStatus.OK
+
+
+@employees_bp.route("/<email>", methods=["GET", "PUT", "DELETE"])
 @token_required
 def query_employee_by_email(origin_employee, email):
     """
@@ -85,7 +85,7 @@ def query_employee_by_email(origin_employee, email):
     return "", HTTPStatus.NO_CONTENT
 
 
-@employee_bp.route("/login", methods=["POST"])
+@employees_bp.route("/login", methods=["POST"])
 def login():
     """
     Logs in an employee.
