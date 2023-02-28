@@ -9,9 +9,9 @@ class Employee(db.Model):
     """
 
     email = db.Column(db.String(100), primary_key=True)
-    password = db.Column(db.String(100))
-    firstName = db.Column(db.String(100))
-    lastName = db.Column(db.String(100))
+    password = db.Column(db.String(100), nullable=False)
+    firstName = db.Column(db.String(100), nullable=False)
+    lastName = db.Column(db.String(100), nullable=False)
     isAdmin = db.Column(db.Boolean, default=False)
 
     def __init__(self, email, password, first_name, last_name, is_admin):

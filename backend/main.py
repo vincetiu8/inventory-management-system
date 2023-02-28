@@ -2,6 +2,7 @@ from flask import Blueprint
 from werkzeug.security import generate_password_hash
 
 from controllers.item import items_bp
+from controllers.transaction import txs_bp
 from extensions import app, db
 from controllers.employee import employees_bp
 from models.employee import Employee
@@ -32,11 +33,13 @@ if __name__ == "__main__":
     item = Item(
         name="Item 1",
         description="Item 1 description",
+        quantity=10,
     )
     db.session.add(item)
     item = Item(
         name="Item 2",
         description="Item 2 description",
+        quantity=20,
     )
     db.session.add(item)
     db.session.commit()
@@ -45,6 +48,7 @@ if __name__ == "__main__":
     bp = Blueprint("main", __name__)
     bp.register_blueprint(employees_bp, url_prefix="/employees")
     bp.register_blueprint(items_bp, url_prefix="/items")
+    bp.register_blueprint(txs_bp, url_prefix="/txs")
     app.register_blueprint(bp, url_prefix="/api")
 
     # run the app

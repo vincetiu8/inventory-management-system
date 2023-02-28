@@ -12,18 +12,6 @@ from models.employee import Employee
 employees_bp = Blueprint("employees", __name__)
 
 
-@employees_bp.route("/all", methods=["GET"])
-@token_required
-def get_all_employees(_):
-    """
-    Gets all employees.
-    :return: all employees in the system
-    """
-    employees = db.session.execute(db.select(Employee)).scalars()
-    serialized_employees = [employee.serialize() for employee in employees]
-    return jsonify(serialized_employees), HTTPStatus.OK
-
-
 @employees_bp.route("/create", methods=["POST"])
 @token_required
 def create_employee(origin_employee):
@@ -46,6 +34,18 @@ def create_employee(origin_employee):
     db.session.add(employee)
     db.session.commit()
     return jsonify(employee.serialize()), HTTPStatus.CREATED
+
+
+@employees_bp.route("/all", methods=["GET"])
+@token_required
+def get_all_employees(_):
+    """
+    Gets all employees.
+    :return: all employees in the system
+    """
+    employees = db.session.execute(db.select(Employee)).scalars()
+    serialized_employees = [employee.serialize() for employee in employees]
+    return jsonify(serialized_employees), HTTPStatus.OK
 
 
 @employees_bp.route("/<email>", methods=["GET", "PUT", "DELETE"])
