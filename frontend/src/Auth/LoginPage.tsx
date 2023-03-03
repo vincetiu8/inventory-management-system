@@ -74,7 +74,6 @@ function LoginPage({ setAuth }: LoginPageProps) {
             </Button>
           </Grid>
         </Grid>
-        <br />
       </Card>
     </Container>
   );

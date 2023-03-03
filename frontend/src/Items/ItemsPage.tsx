@@ -1,5 +1,6 @@
 import React from "react";
-import SortedTable, { IHeadCell } from "../Assets/SortedTable";
+import SortedTable from "../Assets/SortedTable";
+import { IHeadCell } from "../Assets/headCell";
 
 interface IItem {
   itemId: number;
@@ -27,7 +28,7 @@ const headCells: IHeadCell<IItem>[] = [
   {
     id: "quantity",
     label: "Quantity",
-    numeric: false,
+    numeric: true,
   },
 ];
 
@@ -46,6 +47,7 @@ function ItemsPage({ token }: ItemsPageProps) {
       schemaId="items"
       headCells={headCells}
       defaultOrderBy="itemId"
+      name="Item"
     />
   );
 }

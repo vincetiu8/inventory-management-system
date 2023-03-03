@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Grid, Tab, TabList, Tabs, Typography } from "@mui/joy";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IAuth } from "../Auth/IAuth";
 
 interface NavbarProps {
@@ -15,6 +15,7 @@ interface NavbarProps {
  */
 function Navbar({ isAdmin, setAuth }: NavbarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -55,12 +56,42 @@ function Navbar({ isAdmin, setAuth }: NavbarProps) {
                 backgroundColor: `rgba(${theme.vars.palette.neutral.mainChannel}`,
               })}
             >
-              <Tab onClick={() => navigate("/items")}>Items</Tab>
-              <Tab onClick={() => navigate("/txs")}>Transactions</Tab>
+              <Tab
+                onClick={() => navigate("/items")}
+                sx={{
+                  color:
+                    location.pathname.indexOf("items") !== -1
+                      ? "black"
+                      : "white",
+                }}
+              >
+                Items
+              </Tab>
+              <Tab
+                onClick={() => navigate("/txs")}
+                sx={{
+                  color:
+                    location.pathname.indexOf("txs") !== -1 ? "black" : "white",
+                }}
+              >
+                Transactions
+              </Tab>
               {isAdmin && (
-                <Tab onClick={() => navigate("/employees")}>Employees</Tab>
+                <Tab
+                  onClick={() => navigate("/employees")}
+                  sx={{
+                    color:
+                      location.pathname.indexOf("employees") !== -1
+                        ? "black"
+                        : "white",
+                  }}
+                >
+                  Employees
+                </Tab>
               )}
-              <Tab onClick={logout}>Logout</Tab>
+              <Tab onClick={logout} sx={{ color: "white" }}>
+                Logout
+              </Tab>
             </TabList>
           </Tabs>
         </Grid>

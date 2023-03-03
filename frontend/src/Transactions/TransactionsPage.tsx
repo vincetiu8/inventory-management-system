@@ -1,5 +1,6 @@
 import React from "react";
-import SortedTable, { IHeadCell } from "../Assets/SortedTable";
+import SortedTable from "../Assets/SortedTable";
+import { IHeadCell } from "../Assets/headCell";
 
 interface ITransaction {
   txId: number;
@@ -25,7 +26,7 @@ const headCells: IHeadCell<ITransaction>[] = [
   {
     id: "quantity",
     label: "Quantity",
-    numeric: false,
+    numeric: true,
   },
   {
     id: "transactionType",
@@ -45,7 +46,7 @@ const headCells: IHeadCell<ITransaction>[] = [
   {
     id: "itemId",
     label: "Item ID",
-    numeric: false,
+    numeric: true,
   },
 ];
 
@@ -64,6 +65,7 @@ function TransactionsPage({ token }: TransactionsPageProps) {
       schemaId="txs"
       headCells={headCells}
       defaultOrderBy="txId"
+      name="Transaction"
     />
   );
 }

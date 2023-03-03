@@ -3,7 +3,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify
 from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
-from controllers.utils import jsonify_message, token_required, generate_token
+from controllers.utils import jsonify_message, token_required, generate_token, check_fields_exist
 from misc.extensions import db
 from models.employee import Employee
 
@@ -22,6 +22,11 @@ def create_employee(origin_employee):
         return jsonify_message("unauthorized"), HTTPStatus.UNAUTHORIZED
 
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["email", "password", "firstName", "lastName", "isAdmin"])
+    if field_check is not None:
+        return field_check
+
     employee = Employee(
         email=content["email"],
         password=generate_password_hash(content["password"]),
@@ -54,6 +59,11 @@ def search_employees(_):
     :return: all employees in the system matching the search criteria
     """
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["order", "orderBy", "searchKey", "attributes"])
+    if field_check is not None:
+        return field_check
+
     order = content["order"]
     order_by = content["orderBy"]
     order_query = Employee.__dict__[order_by].asc() if order == "asc" else Employee.__dict__[order_by].desc()

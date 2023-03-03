@@ -1,5 +1,6 @@
 import React from "react";
-import SortedTable, { IHeadCell } from "../Assets/SortedTable";
+import SortedTable from "../Assets/SortedTable";
+import { IHeadCell } from "../Assets/headCell";
 
 interface IEmployee {
   email: string;
@@ -46,6 +47,7 @@ function EmployeesPage({ token }: EmployeesPageProps) {
       schemaId="employees"
       headCells={headCells}
       defaultOrderBy="email"
+      name="Employee"
     />
   );
 }

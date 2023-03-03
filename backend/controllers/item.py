@@ -3,7 +3,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify
 from sqlalchemy import or_
 
-from controllers.utils import token_required
+from controllers.utils import token_required, check_fields_exist, jsonify_message
 from misc.extensions import db
 from models.item import Item
 from models.transaction import Transaction
@@ -20,6 +20,14 @@ def create_item(origin_user):
     """
 
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["name", "description", "quantity"])
+    if field_check is not None:
+        return field_check
+
+    if int(content["quantity"]) < 0:
+        return jsonify_message("quantity must be positive"), HTTPStatus.BAD_REQUEST
+
     item = Item(
         name=content["name"],
         description=content["description"],
@@ -32,7 +40,7 @@ def create_item(origin_user):
         transaction_type="other",
         external_entity=None,
         reporter=origin_user.email,
-        item_id=item.id,
+        item_id=item.itemId,
     )
     db.session.add(tx)
     db.session.commit()
@@ -59,6 +67,11 @@ def search_items(_):
     :return: all items in the system matching the search criteria
     """
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["order", "orderBy", "searchKey", "attributes"])
+    if field_check is not None:
+        return field_check
+
     order = content["order"]
     order_by = content["orderBy"]
     order_query = Item.__dict__[order_by].asc() if order == "asc" else Item.__dict__[order_by].desc()

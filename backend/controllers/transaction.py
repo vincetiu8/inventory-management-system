@@ -3,7 +3,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify
 from sqlalchemy import or_
 
-from controllers.utils import token_required
+from controllers.utils import token_required, check_fields_exist
 from misc.extensions import db
 from models.employee import Employee
 from models.item import Item
@@ -21,6 +21,11 @@ def create_transaction(origin_user):
     """
 
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["itemId", "quantity", "transactionType", "externalEntity"])
+    if field_check is not None:
+        return field_check
+
     # check if the item exists and get it
     item = db.get_or_404(Item, content["itemId"])
     tx = Transaction(
@@ -56,6 +61,11 @@ def search_transactions(_):
     :return: all transactions in the system matching the search criteria
     """
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["order", "orderBy", "searchKey", "attributes"])
+    if field_check is not None:
+        return field_check
+
     order = content["order"]
     order_by = content["orderBy"]
     order_query = Transaction.__dict__[order_by].asc() if order == "asc" else Transaction.__dict__[order_by].desc()
