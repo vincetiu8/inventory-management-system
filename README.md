@@ -4,6 +4,10 @@
 
 This is a basic inventory management system that allows you to add, and edit items from a database. It also allows you to search through items and update the stock.
 
+## Architecture Design
+
+You can learn more about the architecture design of this project [here](Architecture-Design-Diagram.pdf).
+
 ## Requirements
 
 1. [node](https://nodejs.org/en/)
