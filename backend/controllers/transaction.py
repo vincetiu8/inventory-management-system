@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy import or_
 
-from controllers.utils import token_required
-from extensions import db
+from controllers.utils import token_required, check_fields_exist
+from misc.extensions import db
 from models.employee import Employee
 from models.item import Item
 from models.transaction import Transaction
@@ -20,6 +21,11 @@ def create_transaction(origin_user):
     """
 
     content = request.get_json()
+
+    field_check = check_fields_exist(content, ["itemId", "quantity", "transactionType", "externalEntity"])
+    if field_check is not None:
+        return field_check
+
     # check if the item exists and get it
     item = db.get_or_404(Item, content["itemId"])
     tx = Transaction(
@@ -47,7 +53,33 @@ def get_all_transactions(_):
     return jsonify(serialized_txs), HTTPStatus.OK
 
 
-@txs_bp.route("/item/<itemId>", methods=["GET"])
+@txs_bp.route("/search", methods=["POST"])
+@token_required
+def search_transactions(_):
+    """
+    Searches for transactions.
+    :return: all transactions in the system matching the search criteria
+    """
+    content = request.get_json()
+
+    field_check = check_fields_exist(content, ["order", "orderBy", "searchKey", "attributes"])
+    if field_check is not None:
+        return field_check
+
+    order = content["order"]
+    order_by = content["orderBy"]
+    order_query = Transaction.__dict__[order_by].asc() if order == "asc" else Transaction.__dict__[order_by].desc()
+    search_key = content["searchKey"]
+    attributes = content["attributes"]
+    filters = []
+    for attribute in attributes:
+        filters.append(Transaction.__dict__[attribute].like(f"%{search_key}%"))
+    txs = db.session.execute(db.select(Transaction).where(or_(*filters)).order_by(order_query)).scalars()
+    serialized_txs = [tx.serialize() for tx in txs]
+    return jsonify(serialized_txs), HTTPStatus.OK
+
+
+@txs_bp.route("/item/<item_id>", methods=["GET"])
 @token_required
 def get_transactions_by_item_id(_, item_id):
     """
@@ -57,7 +89,8 @@ def get_transactions_by_item_id(_, item_id):
     # check if the item exists
     _ = db.get_or_404(Item, item_id)
 
-    txs = db.session.execute(db.select(Transaction).where(Transaction.item_id == item_id)).scalars()
+    txs = db.session.execute(
+        db.select(Transaction).where(Transaction.itemId == item_id).order_by(Transaction.date.desc())).scalars()
     serialized_txs = [tx.serialize() for tx in txs]
     return jsonify(serialized_txs), HTTPStatus.OK
 

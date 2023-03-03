@@ -5,7 +5,7 @@ from http import HTTPStatus
 import jwt
 from flask import jsonify, request
 
-from extensions import app
+from misc.extensions import app
 from models.employee import Employee
 
 
@@ -18,6 +18,19 @@ def jsonify_message(message):
     return jsonify({
         "message": message
     })
+
+
+def check_fields_exist(content, fields):
+    """
+    Checks if all field exists in a json object.
+    :param content: the json object
+    :param fields: the fields to check
+    :return: True if all the fields exist, False otherwise
+    """
+    for field in fields:
+        if field not in content:
+            return jsonify_message(f"{field} is missing"), HTTPStatus.BAD_REQUEST
+    return None
 
 
 def token_required(f):

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import ForeignKey, CheckConstraint
 
-from extensions import db
+from misc.extensions import db
 
 
 class Transaction(db.Model):
