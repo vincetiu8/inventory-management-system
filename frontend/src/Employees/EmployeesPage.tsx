@@ -50,6 +50,7 @@ function EmployeesPage({ token }: EmployeesPageProps) {
         schemaId="employees"
         headCells={headCells}
         defaultOrderBy="email"
+        defaultOrder="asc"
         name="Employee"
         OnClickModal={UpsertModal}
       />

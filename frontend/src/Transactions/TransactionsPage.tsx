@@ -65,6 +65,7 @@ function TransactionsPage({ token }: TransactionsPageProps) {
       schemaId="txs"
       headCells={headCells}
       defaultOrderBy="txId"
+      defaultOrder="desc"
       name="Transaction"
       OnClickModal={null}
     />

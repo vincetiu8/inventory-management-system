@@ -33,6 +33,7 @@ interface TableProps<Data> {
   schemaId: string;
   headCells: IHeadCell<Data>[];
   defaultOrderBy: keyof Data;
+  defaultOrder: Order;
   OnClickModal: any | null;
 }
 
@@ -46,6 +47,7 @@ type Order = "asc" | "desc";
  * @param schemaId - the schema ID to be used as the URL extension when making requests
  * @param headCells - the column headers
  * @param defaultOrderBy - the column to sort by default
+ * @param defaultOrder - the order to sort by default
  * @param OnClickModal - the modal to be displayed when an item is clicked
  */
 function SortedTable<Data>({
@@ -54,13 +56,14 @@ function SortedTable<Data>({
   schemaId,
   headCells,
   defaultOrderBy,
+  defaultOrder,
   OnClickModal,
 }: TableProps<Data>) {
   // The items to be displayed in the table
   const [items, setItems] = useState<Data[] | null>(null);
 
   // Filtering and sorting parameters
-  const [order, setOrder] = useState<Order>("asc");
+  const [order, setOrder] = useState<Order>(defaultOrder);
   const [orderBy, setOrderBy] = useState<keyof Data>(defaultOrderBy);
   const [searchKey, setSearchKey] = useState<string>("");
   const [searchAttributes, setSearchAttributes] = useState<string[]>([]);

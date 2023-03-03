@@ -48,6 +48,7 @@ function ItemsPage({ token }: ItemsPageProps) {
       schemaId="items"
       headCells={headCells}
       defaultOrderBy="itemId"
+      defaultOrder="asc"
       name="Item"
       OnClickModal={UpsertModal}
     />

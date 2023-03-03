@@ -1,3 +1,4 @@
+import datetime
 import random
 
 from werkzeug.security import generate_password_hash
@@ -60,6 +61,7 @@ def seed_transactions(num):
             reporter=employee.email,
             item_id=item.itemId,
         )
+        tx.date = tx.date - datetime.timedelta(days=num - i)
         db.session.add(tx)
         item.quantity += tx.quantity
 
