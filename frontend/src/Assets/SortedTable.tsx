@@ -123,7 +123,6 @@ function SortedTable<Data>({
       await fetchItems();
     };
     fetchItemsWrapper();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [order, orderBy, searchKey, searchAttributes]);
 
   return (

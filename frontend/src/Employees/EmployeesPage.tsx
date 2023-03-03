@@ -3,13 +3,7 @@ import { Container } from "@mui/joy";
 import SortedTable from "../Assets/SortedTable";
 import { IHeadCell } from "../Assets/headCell";
 import UpsertModal from "../Assets/UpsertModal";
-
-interface IEmployee {
-  email: string;
-  firstName: string;
-  lastName: string;
-  isAdmin: boolean;
-}
+import { IEmployee } from "../Assets/models";
 
 const headCells: IHeadCell<IEmployee>[] = [
   {

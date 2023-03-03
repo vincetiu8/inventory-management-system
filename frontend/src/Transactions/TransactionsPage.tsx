@@ -1,16 +1,7 @@
 import React from "react";
 import SortedTable from "../Assets/SortedTable";
 import { IHeadCell } from "../Assets/headCell";
-
-interface ITransaction {
-  txId: number;
-  date: string;
-  quantity: number;
-  transactionType: string;
-  externalEntity: string;
-  reporter: string;
-  itemId: number;
-}
+import { ITransaction } from "../Assets/models";
 
 const headCells: IHeadCell<ITransaction>[] = [
   {

@@ -13,8 +13,8 @@ if __name__ == "__main__":
         db.create_all()
 
         seed_employees(10)
-        seed_items(60)
-        seed_transactions(600)
+        seed_items(10)
+        seed_transactions(1600)
 
     # register controller routes
     bp = Blueprint("main", __name__)

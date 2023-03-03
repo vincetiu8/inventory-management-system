@@ -1,14 +1,8 @@
 import React from "react";
 import SortedTable from "../Assets/SortedTable";
 import { IHeadCell } from "../Assets/headCell";
-import UpsertModal from "../Assets/UpsertModal";
-
-interface IItem {
-  itemId: number;
-  name: string;
-  description: string;
-  quantity: number;
-}
+import { IItem } from "../Assets/models";
+import ItemHistoryModal from "./ItemHistoryModal";
 
 const headCells: IHeadCell<IItem>[] = [
   {
@@ -50,7 +44,7 @@ function ItemsPage({ token }: ItemsPageProps) {
       defaultOrderBy="itemId"
       defaultOrder="asc"
       name="Item"
-      OnClickModal={UpsertModal}
+      OnClickModal={ItemHistoryModal}
     />
   );
 }

@@ -14,7 +14,7 @@ import axios from "axios";
 import { IHeadCell } from "./headCell";
 import { ServerError } from "./serverError";
 
-interface UpsertModalProps<Data> {
+export interface UpsertModalProps<Data> {
   token: string;
   name: string;
   headCells: IHeadCell<Data>[];
@@ -114,7 +114,10 @@ function UpsertModal<Data>({
                 (cell.id !== primaryKey || !cell.numeric) &&
                 cell.id !== "date" && // hardcoded
                 cell.id !== "reporter" && // hardcoded
-                cell.id !== "isAdmin" // we add this back in the modal, because this is a special boolean case
+                cell.id !== "isAdmin" && // we add this back in the modal, because this is a special boolean case
+                (cell.id !== "quantity" ||
+                  schemaId !== "items" ||
+                  !existingItem) // we don't want the user to be able to modify an existing item's quantity directly
             )
             .map((headCell) => (
               <Grid key={headCell.id.toString()}>

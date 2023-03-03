@@ -79,7 +79,7 @@ def search_transactions(_):
     return jsonify(serialized_txs), HTTPStatus.OK
 
 
-@txs_bp.route("/item/<itemId>", methods=["GET"])
+@txs_bp.route("/item/<item_id>", methods=["GET"])
 @token_required
 def get_transactions_by_item_id(_, item_id):
     """
@@ -89,7 +89,8 @@ def get_transactions_by_item_id(_, item_id):
     # check if the item exists
     _ = db.get_or_404(Item, item_id)
 
-    txs = db.session.execute(db.select(Transaction).where(Transaction.item_id == item_id)).scalars()
+    txs = db.session.execute(
+        db.select(Transaction).where(Transaction.itemId == item_id).order_by(Transaction.date.desc())).scalars()
     serialized_txs = [tx.serialize() for tx in txs]
     return jsonify(serialized_txs), HTTPStatus.OK
 
