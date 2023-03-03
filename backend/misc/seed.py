@@ -61,7 +61,7 @@ def seed_transactions(num):
             reporter=employee.email,
             item_id=item.itemId,
         )
-        tx.date = tx.date - datetime.timedelta(days=num - i)
+        tx.date = tx.date - datetime.timedelta(days=(num - i) // 4)
         db.session.add(tx)
         item.quantity += tx.quantity
 
