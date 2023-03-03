@@ -1,6 +1,4 @@
-from werkzeug.security import generate_password_hash
-
-from extensions import db
+from misc.extensions import db
 
 
 class Employee(db.Model):

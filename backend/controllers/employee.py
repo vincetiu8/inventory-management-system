@@ -1,12 +1,10 @@
-import datetime
 from http import HTTPStatus
 
-import jwt
 from flask import Blueprint, request, jsonify
+from sqlalchemy import or_
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import timedelta, datetime
 from controllers.utils import jsonify_message, token_required, generate_token
-from extensions import db
+from misc.extensions import db
 from models.employee import Employee
 
 employees_bp = Blueprint("employees", __name__)
@@ -44,6 +42,27 @@ def get_all_employees(_):
     :return: all employees in the system
     """
     employees = db.session.execute(db.select(Employee)).scalars()
+    serialized_employees = [employee.serialize() for employee in employees]
+    return jsonify(serialized_employees), HTTPStatus.OK
+
+
+@employees_bp.route("/search", methods=["POST"])
+@token_required
+def search_employees(_):
+    """
+    Searches for employees.
+    :return: all employees in the system matching the search criteria
+    """
+    content = request.get_json()
+    order = content["order"]
+    order_by = content["orderBy"]
+    order_query = Employee.__dict__[order_by].asc() if order == "asc" else Employee.__dict__[order_by].desc()
+    search_key = content["searchKey"]
+    attributes = content["attributes"]
+    filters = []
+    for attribute in attributes:
+        filters.append(Employee.__dict__[attribute].like(f"%{search_key}%"))
+    employees = db.session.execute(db.select(Employee).where(or_(*filters)).order_by(order_query)).scalars()
     serialized_employees = [employee.serialize() for employee in employees]
     return jsonify(serialized_employees), HTTPStatus.OK
 
@@ -106,8 +125,9 @@ def login():
         # return an error if the password is incorrect
         return jsonify_message("invalid credentials"), HTTPStatus.UNAUTHORIZED
 
-    # generate and return a jwt token
+    # generate and return a jwt token and whether the employee is an admin or not
     token = generate_token(employee)
     return jsonify({
-        "token": token
+        "token": token,
+        "isAdmin": employee.isAdmin
     }), HTTPStatus.OK

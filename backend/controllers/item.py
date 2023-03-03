@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy import or_
 
 from controllers.utils import token_required
-from extensions import db
+from misc.extensions import db
 from models.item import Item
 from models.transaction import Transaction
 
@@ -46,6 +47,27 @@ def get_all_items(_):
     :return: all items in the system
     """
     items = db.session.execute(db.select(Item)).scalars()
+    serialized_items = [item.serialize() for item in items]
+    return jsonify(serialized_items), HTTPStatus.OK
+
+
+@items_bp.route("/search", methods=["POST"])
+@token_required
+def search_items(_):
+    """
+    Searches for items.
+    :return: all items in the system matching the search criteria
+    """
+    content = request.get_json()
+    order = content["order"]
+    order_by = content["orderBy"]
+    order_query = Item.__dict__[order_by].asc() if order == "asc" else Item.__dict__[order_by].desc()
+    search_key = content["searchKey"]
+    attributes = content["attributes"]
+    filters = []
+    for attribute in attributes:
+        filters.append(Item.__dict__[attribute].like(f"%{search_key}%"))
+    items = db.session.execute(db.select(Item).where(or_(*filters)).order_by(order_query)).scalars()
     serialized_items = [item.serialize() for item in items]
     return jsonify(serialized_items), HTTPStatus.OK
 

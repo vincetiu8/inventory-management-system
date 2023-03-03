@@ -1,6 +1,6 @@
 from sqlalchemy import CheckConstraint
 
-from extensions import db
+from misc.extensions import db
 
 
 class Item(db.Model):
@@ -9,7 +9,7 @@ class Item(db.Model):
     """
 
     __table_args__ = (
-        CheckConstraint("quantity > 0", name='quantity_positive'),
+        CheckConstraint("quantity >= 0", name='quantity_non_negative'),
     )
 
     itemId = db.Column(db.Integer, primary_key=True)

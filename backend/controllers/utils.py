@@ -5,7 +5,7 @@ from http import HTTPStatus
 import jwt
 from flask import jsonify, request
 
-from extensions import app
+from misc.extensions import app
 from models.employee import Employee
 
 
