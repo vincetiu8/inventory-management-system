@@ -1,6 +1,8 @@
 import React from "react";
+import { Container } from "@mui/joy";
 import SortedTable from "../Assets/SortedTable";
 import { IHeadCell } from "../Assets/headCell";
+import UpsertModal from "../Assets/UpsertModal";
 
 interface IEmployee {
   email: string;
@@ -42,13 +44,16 @@ interface EmployeesPageProps {
  */
 function EmployeesPage({ token }: EmployeesPageProps) {
   return (
-    <SortedTable
-      token={token}
-      schemaId="employees"
-      headCells={headCells}
-      defaultOrderBy="email"
-      name="Employee"
-    />
+    <Container maxWidth={false}>
+      <SortedTable
+        token={token}
+        schemaId="employees"
+        headCells={headCells}
+        defaultOrderBy="email"
+        name="Employee"
+        OnClickModal={UpsertModal}
+      />
+    </Container>
   );
 }
 

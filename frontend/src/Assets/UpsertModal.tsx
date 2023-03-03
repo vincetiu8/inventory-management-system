@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Checkbox,
@@ -14,39 +14,63 @@ import axios from "axios";
 import { IHeadCell } from "./headCell";
 import { ServerError } from "./serverError";
 
-interface InsertModalProps<Data> {
+interface UpsertModalProps<Data> {
   token: string;
   name: string;
   headCells: IHeadCell<Data>[];
   schemaId: string;
   open: boolean;
   onClose: () => void;
+  primaryKey: keyof Data;
+  existingItem: Data | null;
 }
 
 /**
- * Modal for inserting a new item
+ * Modal for inserting a new item or updating an existing one
  * @param token - the JWT token
  * @param name - the name of the item
  * @param headCells - the head cells of the table
  * @param schemaId - the schema ID
  * @param open - whether the modal is open
  * @param onClose - the function to call when the modal is closed
+ * @param primaryKey - the primary key of the item
+ * @param existingItem - the existing item to update, if any
  */
-function InsertModal<Data>({
+function UpsertModal<Data>({
   token,
   name,
   headCells,
   schemaId,
   open,
   onClose,
-}: InsertModalProps<Data>) {
-  const [newItem, setNewItem] = React.useState<Data>({
-    isAdmin: false,
-  } as Data);
+  primaryKey,
+  existingItem,
+}: UpsertModalProps<Data>) {
+  const [newItem, setNewItem] = React.useState<Data>(
+    existingItem ||
+      ({
+        isAdmin: false,
+      } as Data)
+  );
   const [error, setError] = React.useState<string | null>(null);
 
   const submitItem = async () => {
     try {
+      if (existingItem) {
+        const resp = await axios.put(
+          `/api/${schemaId}/${existingItem[primaryKey]}`,
+          newItem,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (resp.status === 202) {
+          onClose();
+        }
+        return;
+      }
       const resp = await axios.post(`/api/${schemaId}/create`, newItem, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -61,6 +85,15 @@ function InsertModal<Data>({
     }
   };
 
+  useEffect(() => {
+    setNewItem(
+      existingItem ||
+        ({
+          isAdmin: false,
+        } as Data)
+    );
+  }, [existingItem]);
+
   return (
     <Modal
       open={open}
@@ -71,23 +104,34 @@ function InsertModal<Data>({
         <ModalClose />
         <Grid container spacing={2} direction="column">
           <Grid sx={{ display: "flex", justifyContent: "center" }}>
-            <Typography level="h4">Insert {name}</Typography>
+            <Typography level="h4">
+              {existingItem ? "Update" : "Insert"} {name}
+            </Typography>
           </Grid>
-          {headCells.map((headCell) => (
-            <Grid key={headCell.id.toString()}>
-              <FormLabel>{headCell.label}</FormLabel>
-              <Input
-                placeholder={headCell.label}
-                onChange={(e) => {
-                  setNewItem({
-                    ...newItem,
-                    [headCell.id]: e.target.value,
-                  });
-                }}
-                type={headCell.numeric ? "number" : "text"}
-              />
-            </Grid>
-          ))}
+          {headCells
+            .filter(
+              (cell) =>
+                (cell.id !== primaryKey || !cell.numeric) &&
+                cell.id !== "date" && // hardcoded
+                cell.id !== "reporter" && // hardcoded
+                cell.id !== "isAdmin" // we add this back in the modal, because this is a special boolean case
+            )
+            .map((headCell) => (
+              <Grid key={headCell.id.toString()}>
+                <FormLabel>{headCell.label}</FormLabel>
+                <Input
+                  placeholder={headCell.label}
+                  value={newItem[headCell.id] ? `${newItem[headCell.id]}` : ""}
+                  onChange={(e) => {
+                    setNewItem({
+                      ...newItem,
+                      [headCell.id]: e.target.value,
+                    });
+                  }}
+                  type={headCell.numeric ? "number" : "text"}
+                />
+              </Grid>
+            ))}
           {
             // Also ask to specify user password
             schemaId === "employees" && (
@@ -124,7 +168,7 @@ function InsertModal<Data>({
           }
           <Grid sx={{ display: "flex", justifyContent: "center" }}>
             <Button variant="outlined" onClick={submitItem}>
-              Create {name}
+              {existingItem ? "Update" : "Create"} {name}
             </Button>
           </Grid>
           {
@@ -148,4 +192,4 @@ function InsertModal<Data>({
   );
 }
 
-export default InsertModal;
+export default UpsertModal;

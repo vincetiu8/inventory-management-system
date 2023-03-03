@@ -24,7 +24,7 @@ import {
   KeyboardArrowRight,
 } from "@mui/icons-material";
 import axios from "axios";
-import InsertModal from "./InsertModal";
+import UpsertModal from "./UpsertModal";
 import { IHeadCell } from "./headCell";
 
 interface TableProps<Data> {
@@ -33,6 +33,7 @@ interface TableProps<Data> {
   schemaId: string;
   headCells: IHeadCell<Data>[];
   defaultOrderBy: keyof Data;
+  OnClickModal: any | null;
 }
 
 type Order = "asc" | "desc";
@@ -45,6 +46,7 @@ type Order = "asc" | "desc";
  * @param schemaId - the schema ID to be used as the URL extension when making requests
  * @param headCells - the column headers
  * @param defaultOrderBy - the column to sort by default
+ * @param OnClickModal - the modal to be displayed when an item is clicked
  */
 function SortedTable<Data>({
   token,
@@ -52,6 +54,7 @@ function SortedTable<Data>({
   schemaId,
   headCells,
   defaultOrderBy,
+  OnClickModal,
 }: TableProps<Data>) {
   // The items to be displayed in the table
   const [items, setItems] = useState<Data[] | null>(null);
@@ -70,7 +73,8 @@ function SortedTable<Data>({
   const [page, setPage] = useState<number>(0);
 
   // Modal parameters
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [insertModalOpen, setInsertModalOpen] = useState<boolean>(false);
+  const [clickedItem, setClickedItem] = useState<Data | null>(null);
 
   // Fetches the items from the database
   const fetchItems = async () => {
@@ -179,7 +183,7 @@ function SortedTable<Data>({
               <Button
                 variant="outlined"
                 onClick={() => {
-                  setModalOpen(true);
+                  setInsertModalOpen(true);
                 }}
               >
                 Add {name}
@@ -249,7 +253,10 @@ function SortedTable<Data>({
                       Math.min((page + 1) * itemsPerPage, items.length)
                     )
                     .map((item) => (
-                      <tr key={`${item[defaultOrderBy]}`}>
+                      <tr
+                        key={`${item[defaultOrderBy]}`}
+                        onClick={() => setClickedItem(item)}
+                      >
                         {headCells.map((headCell) => (
                           <td key={headCell.id.toString()}>
                             <Typography level="body2">
@@ -323,23 +330,34 @@ function SortedTable<Data>({
           </Sheet>
         </Grid>
       </Grid>
-      <InsertModal
+      <UpsertModal
         token={token}
         name={name}
-        headCells={headCells.filter(
-          (cell) =>
-            (cell.id !== defaultOrderBy || !cell.numeric) &&
-            cell.id !== "date" && // hardcoded
-            cell.id !== "reporter" && // hardcoded
-            cell.id !== "isAdmin" // we add this back in the modal, because this is a special boolean case
-        )}
+        headCells={headCells}
         schemaId={schemaId}
-        open={modalOpen}
+        open={insertModalOpen}
         onClose={() => {
-          setModalOpen(false);
+          setInsertModalOpen(false);
           fetchItems();
         }}
+        primaryKey={defaultOrderBy}
+        existingItem={null}
       />
+      {OnClickModal && (
+        <OnClickModal
+          token={token}
+          name={name}
+          headCells={headCells}
+          schemaId={schemaId}
+          open={clickedItem !== null}
+          onClose={() => {
+            setClickedItem(null);
+            fetchItems();
+          }}
+          primaryKey={defaultOrderBy}
+          existingItem={clickedItem}
+        />
+      )}
     </Container>
   );
 }

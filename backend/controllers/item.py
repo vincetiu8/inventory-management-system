@@ -85,7 +85,7 @@ def search_items(_):
     return jsonify(serialized_items), HTTPStatus.OK
 
 
-@items_bp.route("/<itemId>", methods=["GET", "PUT", "DELETE"])
+@items_bp.route("/<item_id>", methods=["GET", "PUT", "DELETE"])
 @token_required
 def query_item_by_id(_, item_id):
     """

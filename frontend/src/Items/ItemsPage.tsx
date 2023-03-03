@@ -1,6 +1,7 @@
 import React from "react";
 import SortedTable from "../Assets/SortedTable";
 import { IHeadCell } from "../Assets/headCell";
+import UpsertModal from "../Assets/UpsertModal";
 
 interface IItem {
   itemId: number;
@@ -48,6 +49,7 @@ function ItemsPage({ token }: ItemsPageProps) {
       headCells={headCells}
       defaultOrderBy="itemId"
       name="Item"
+      OnClickModal={UpsertModal}
     />
   );
 }

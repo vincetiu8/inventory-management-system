@@ -66,6 +66,7 @@ function TransactionsPage({ token }: TransactionsPageProps) {
       headCells={headCells}
       defaultOrderBy="txId"
       name="Transaction"
+      OnClickModal={null}
     />
   );
 }
